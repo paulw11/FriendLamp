@@ -1,5 +1,5 @@
 # FriendLamp
-Micropython code for the [FriendLamp project](https://www.instructables.com/Friend-Lamp-Stay-in-Touch-With-Light/)
+Micropython code for the [FriendLamp Instructable](https://www.instructables.com/Friend-Lamp-Stay-in-Touch-With-Light/)
 
 The Friend Lamp lets someone know you are thinking of them with just a touch. 
 

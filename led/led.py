@@ -10,7 +10,8 @@ from mqtt import mqtt
 
 LED_FILE="led.json"
 
-DIM_DELAY=30000	# Dim after 30 seconds
+DIM_DELAY=30000 # Dim after 30 seconds
+KEEPALIVE_INTERVAL=300000 # Send keepalive after 5 minutes
 
 np = neopixel.NeoPixel(machine.Pin(27), 12)
 touch = machine.Pin(28, Pin.IN, Pin.PULL_UP)
@@ -18,6 +19,7 @@ touch = machine.Pin(28, Pin.IN, Pin.PULL_UP)
 number_of_pixels = 12
 
 dim_timer = Timer(-1)
+keepalive_timer = Timer(-1)
 
 current_color=(0,0,0)
 
@@ -124,6 +126,7 @@ def random_color():
 def init_led():
     clear()
     touch.irq(trigger=Pin.IRQ_RISING, handler=touch_callback)
+    keepalive_timer.init(mode=Timer.PERIODIC, period = KEEPALIVE_INTERVAL, callback = keepalive_timer_callback)
     
 def init_mqtt():
     mqtt.mqtt_init(mqtt_callback)
@@ -144,9 +147,14 @@ def set_current(color, save=True, publish=False, use_shift=False):
     dim_timer.init(mode=Timer.ONE_SHOT, period = DIM_DELAY, callback = dim_timer_callback)
         
 def dim_timer_callback(timer):
-    global dim_timer
     timer.deinit()
     set_all(current_color,brightness=0.2)
+    
+
+def keepalive_timer_callback(timer):
+    global current_color
+    print("Sending keepalive")
+    mqtt.mqtt_send(current_color)
     
 
 def save_color(color,publish=True):

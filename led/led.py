@@ -154,20 +154,23 @@ def dim_timer_callback(timer):
 def keepalive_timer_callback(timer):
     global current_color
     print("Sending keepalive")
-    mqtt.mqtt_send(current_color)
-    
+    mqtt.mqtt_send(color_object(current_color))
 
-def save_color(color,publish=True):
-    with open(LED_FILE, "w") as f:
-        color = {
+def color_object(color):
+    return {
             "red":color[0],
             "green":color[1],
             "blue":color[2]
             }
+    
+
+def save_color(color,publish=True):
+    with open(LED_FILE, "w") as f:
+        obj = color_object(color)
         json.dump(color, f)
         f.close()
         if publish:
-            mqtt.mqtt_send(color)
+            mqtt.mqtt_send(obj)
 
     
 def load_color():
